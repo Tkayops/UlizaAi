@@ -11,6 +11,9 @@ from llama_index.embeddings.mistralai import MistralAIEmbedding
 from llama_index.core import Settings
 from llama_index.core import SimpleDirectoryReader
 from llama_index.core import VectorStoreIndex
+from llama_index.core.tools import QueryEngineTool, ToolMetadata
+from llama_index.core.agent import FunctionCallingAgent
+
 
 
 
@@ -23,21 +26,20 @@ Settings.llm = llm
 Settings.embed_model = embed_model
 
 #Loading Data
-uber_docs = SimpleDirectoryReader(input_files=["./documents/Constitution.pdf"]).load_data()
+Constitution_docs = SimpleDirectoryReader(input_files=["./documents/Constitution.pdf"]).load_data()
 
 #Indexing Data
-uber_index = VectorStoreIndex.from_documents(uber_docs)
-uber_query_engine = uber_index.as_query_engine(similarity_top_k=5)
+Constitution_index = VectorStoreIndex.from_documents(Constitution_docs)
+Constitution_query_engine = Constitution_index.as_query_engine(similarity_top_k=5)
 
 #Querying Data
 
-from llama_index.core.tools import QueryEngineTool, ToolMetadata
-from llama_index.core.agent import FunctionCallingAgent
+
 
 query_engine_tools = [
 
     QueryEngineTool(
-        query_engine=uber_query_engine,
+        query_engine=Constitution_query_engine,
         metadata=ToolMetadata(
             name="Constitution_2010",
             description="Provides information about Kenyan Constitution for year 2010",
