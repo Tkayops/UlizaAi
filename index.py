@@ -30,12 +30,29 @@ uber_index = VectorStoreIndex.from_documents(uber_docs)
 uber_query_engine = uber_index.as_query_engine(similarity_top_k=5)
 
 #Querying Data
-response = uber_query_engine.query("When could a passport be denied ? give with detailed explanation giveall the criteria")
-print(response)
 
+from llama_index.core.tools import QueryEngineTool, ToolMetadata
+from llama_index.core.agent import FunctionCallingAgent
 
+query_engine_tools = [
 
+    QueryEngineTool(
+        query_engine=uber_query_engine,
+        metadata=ToolMetadata(
+            name="Constitution_2010",
+            description="Provides information about Kenyan Constitution for year 2010",
+        ),
+    ),
+]
 
+agent = FunctionCallingAgent.from_tools(
+    query_engine_tools,
+    llm=llm,
+    verbose=True,
+    allow_parallel_tool_calls=False,
+)
+
+response = agent.chat("What are the circumstances in which a passport could be denied?Give all the details expalaining it to the full")
 
 
 
