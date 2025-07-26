@@ -33,7 +33,8 @@ Constitution_index = VectorStoreIndex.from_documents(Constitution_docs)
 Constitution_query_engine = Constitution_index.as_query_engine(similarity_top_k=5)
 
 #Querying Data
-
+print('What would you love to know about the Kenyan Constitution :')
+x = input()
 
 
 query_engine_tools = [
@@ -54,7 +55,8 @@ agent = FunctionCallingAgent.from_tools(
     allow_parallel_tool_calls=False,
 )
 
-response = agent.chat("What are the circumstances in which a passport could be denied?Give all the details expalaining it to the full")
+response = agent.chat(x)
+print(response)
 
 
 
