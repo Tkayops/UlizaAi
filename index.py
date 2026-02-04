@@ -1,10 +1,10 @@
+from mistralai import Mistral
 import nest_asyncio
+import asyncio
 
 nest_asyncio.apply()
 
 import os
-
-
 
 from llama_index.llms.mistralai import MistralAI
 from llama_index.embeddings.mistralai import MistralAIEmbedding
@@ -12,14 +12,14 @@ from llama_index.core import Settings
 from llama_index.core import SimpleDirectoryReader
 from llama_index.core import VectorStoreIndex
 from llama_index.core.tools import QueryEngineTool, ToolMetadata
-from llama_index.core.agent import FunctionCallingAgent
+from llama_index.core.agent import ReActAgent
 
 
 
 
 os.environ["MISTRAL_API_KEY"] = "0uLqHjUaxWHIBObcCbwSac4J3l0CLuas"
 
-llm = MistralAI(model="open-mixtral-8x22b", temperature=0.1)
+llm = MistralAI(model="mistral-medium-latest", temperature=0.1)
 embed_model = MistralAIEmbedding(model_name="mistral-embed")
 
 Settings.llm = llm
@@ -48,15 +48,16 @@ query_engine_tools = [
     ),
 ]
 
-agent = FunctionCallingAgent.from_tools(
-    query_engine_tools,
+agent = ReActAgent(
+    tools=query_engine_tools,
     llm=llm,
     verbose=True,
-    allow_parallel_tool_calls=False,
 )
-
-response = agent.chat(x)
+response = Constitution_query_engine.query(x)
 print(response)
+
+
+
 
 
 
