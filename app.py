@@ -1,8 +1,7 @@
 from mistralai import Mistral
-import nest_asyncio
-import asyncio
+from fastapi import FastAPI
+from pydantic import BaseModel
 
-nest_asyncio.apply()
 
 import os
 
@@ -33,8 +32,8 @@ Constitution_index = VectorStoreIndex.from_documents(Constitution_docs)
 Constitution_query_engine = Constitution_index.as_query_engine(similarity_top_k=5)
 
 #Querying Data
-print('What would you love to know about the Kenyan Constitution :')
-x = input()
+#print('What would you love to know about the Kenyan Constitution :')
+#x = input()
 
 
 query_engine_tools = [
@@ -44,7 +43,10 @@ query_engine_tools = [
         metadata=ToolMetadata(
             name="Constitution_2010",
             description="Provides information about Kenyan Constitution for year 2010",
+            
         ),
+        
+
     ),
 ]
 
@@ -53,8 +55,27 @@ agent = ReActAgent(
     llm=llm,
     verbose=True,
 )
-response = Constitution_query_engine.query(x)
-print(response)
+
+
+# FastAPI app
+app = FastAPI(title="Kenyan Constitution Query API")
+
+class QueryRequest(BaseModel):
+    question: str
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the Kenyan Constitution Query API"}
+
+@app.post("/query")
+async def query_constitution(request: QueryRequest):
+    """
+    Endpoint to query the Kenyan Constitution.
+    """
+    question = request.question
+    # Use the query engine to get a response
+    response = Constitution_query_engine.query(question)
+    return {"question": question, "answer": str(response)}
 
 
 
